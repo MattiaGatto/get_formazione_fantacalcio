@@ -1,0 +1,1 @@
+python "C:\Users\matti\Desktop\doc\FANTACALCIO 2022-2023\Fanatacalcio_project\selection_players_serie_A.py"
