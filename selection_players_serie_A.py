@@ -291,7 +291,7 @@ paragrafo2 = data2.find('header', attrs = {'class': 'mb-3 d-flex align-items-cen
 link=str(paragrafo2).split("href=")[1]
 link="https://www.fantacalcio.it"+link.split("\" ")[0][1:]
 #print(link)
-dati = pd.read_excel('C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Quotazioni_Fantacalcio_Stagione_2022_23_ds.xlsx',header=1)
+dati = pd.read_excel('C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fanatacalcio_project/Quotazioni_Fantacalcio_Stagione_2022_23_ds.xlsx',header=1)
 
 ind=[]
 ruolo=[]
@@ -418,4 +418,16 @@ formazione_finale=formazione_titolare.append(formazione_panchina)
 formazione_finale.index = np.arange(1, len(formazione_finale) + 1)
 #formazione_finale
 
-formazione_finale.to_excel("C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/formazione_finale_da schierare.xlsx")
+formazione_finale.to_excel("C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fanatacalcio_project/formazione_finale_da schierare.xlsx")
+
+fig, ax = plt.subplots()
+fig.set_size_inches(10, 10)
+# hide axes
+fig.patch.set_visible(False)
+ax.axis('off')
+ax.axis('tight')
+ax.table(cellText=formazione_finale.values, colLabels=formazione_finale.columns, loc='center')
+
+fig.tight_layout()
+plt.savefig('C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fanatacalcio_project/formazione_finale_da schierare.png', dpi=300)
+plt.show()
