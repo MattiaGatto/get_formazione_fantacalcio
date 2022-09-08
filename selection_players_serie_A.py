@@ -34,7 +34,7 @@ def scramping(paragrafo,start_index,end_match):
 
   start=p_new[p_new.index("-")+1:].index("-")+(p_new.index("-")+1)+1
   dati_p=p_new[0+start_index:start+start_index]
-
+  giornata=dati_p[0].strip()
   info_=p_new[start+22+start_index:] # 22 giocatori in campo, da 9+29 in poi abbiamo informazioni sulla partita e sulle rose
 
   info_partita=info_[0]
@@ -116,7 +116,7 @@ def scramping(paragrafo,start_index,end_match):
   if end_match==True:
     limit_lista_indubbio=info_[index_in_dubbio+1:]
   else:
-    limit_lista_indubbio=info_[index_in_dubbio+1:info_.index('6')]
+    limit_lista_indubbio=info_[index_in_dubbio+1:info_.index(giornata)]
   for x in limit_lista_indubbio:
     if x!="Nessun calciatore":
       lista_indubbio.append(x)
@@ -215,9 +215,10 @@ def scramping(paragrafo,start_index,end_match):
   if end_match==True:
     indice=len(info_)+start+22+start_index
   else:
-    indice=info_.index('6')+start+22+start_index
+    indice=info_.index(giornata)+start+22+start_index
   
   return df,indice
+
 
 
 p = paragrafo.text
@@ -423,6 +424,7 @@ formazione_finale.to_excel("C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fan
 fig, ax = plt.subplots()
 fig.set_size_inches(10, 10)
 # hide axes
+fig.suptitle("Giornata N°"+df['Giornata N'][0])
 fig.patch.set_visible(False)
 ax.axis('off')
 ax.axis('tight')
