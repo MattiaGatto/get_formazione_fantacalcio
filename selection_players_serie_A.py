@@ -266,6 +266,9 @@ Rosa_fantacalcio=[
     "Pinamonti",
     "Caprari"
   ]
+
+Modulo_scelto="3-4-3"
+schieramento=Modulo_scelto.split("-")
 #len(Rosa_fantacalcio)
 
 def rosa_df(df,Rosa_fantacalcio):
@@ -358,15 +361,15 @@ def aggiungi(ruolo,g,rosa,qnt):
 
 
 def controlla(formazione,rosa):
-  if len(formazione.loc[formazione['Ruolo']=='A' ])<5:
+  if len(formazione.loc[formazione['Ruolo']=='A' ])<(int(schieramento[2])+2):
     # print("A")
-    formazione=aggiungi('A',formazione,rosa,5-len(formazione.loc[formazione['Ruolo']=='A' ]))
-  if len(formazione.loc[formazione['Ruolo']=='C' ])<6:
+    formazione=aggiungi('A',formazione,rosa,(int(schieramento[2])+2)-len(formazione.loc[formazione['Ruolo']=='A' ]))
+  if len(formazione.loc[formazione['Ruolo']=='C' ])<(int(schieramento[1])+2):
     # print("C")
-    formazione=aggiungi('C',formazione,rosa,6-len(formazione.loc[formazione['Ruolo']=='C' ]))
-  if len(formazione.loc[formazione['Ruolo']=='D' ])<5:
+    formazione=aggiungi('C',formazione,rosa,(int(schieramento[1])+2)-len(formazione.loc[formazione['Ruolo']=='C' ]))
+  if len(formazione.loc[formazione['Ruolo']=='D' ])<(int(schieramento[0])+2):
     # print("D")
-    formazione=aggiungi('D',formazione,rosa,5-len(formazione.loc[formazione['Ruolo']=='D' ]))
+    formazione=aggiungi('D',formazione,rosa,(int(schieramento[0])+2)-len(formazione.loc[formazione['Ruolo']=='D' ]))
   if len(formazione.loc[formazione['Ruolo']=='P' ])<2:
     # print("P")
     formazione=aggiungi('P',formazione,rosa,2-len(formazione.loc[formazione['Ruolo']=='P' ]))
@@ -400,9 +403,9 @@ def titolari_panchina(formazione,Ruolo,n_tit,n_panc):
   panchina=titolari_top.head(n_panc)
   return titolari,panchina
 
-attaccanti_titolari,attaccanti_panchinari= titolari_panchina(formazione,'A',3,2)
-centrocampisti_titolari,centrocampisti_panchinari= titolari_panchina(formazione,'C',4,2)
-difensori_titolari,difensori_panchinari= titolari_panchina(formazione,'D',3,2)
+attaccanti_titolari,attaccanti_panchinari= titolari_panchina(formazione,'A',int(schieramento[2]),2)
+centrocampisti_titolari,centrocampisti_panchinari= titolari_panchina(formazione,'C',int(schieramento[1]),2)
+difensori_titolari,difensori_panchinari= titolari_panchina(formazione,'D',int(schieramento[0]),2)
 portieri_titolari,portieri_panchinari= titolari_panchina(formazione,'P',1,1)
 
 formazione_titolare=portieri_titolari.append(difensori_titolari.append(centrocampisti_titolari.append(attaccanti_titolari))).reset_index(drop=True)
@@ -424,7 +427,7 @@ formazione_finale.to_excel("C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fan
 fig, ax = plt.subplots()
 fig.set_size_inches(10, 10)
 # hide axes
-fig.suptitle("Giornata N°"+df['Giornata N'][0])
+fig.suptitle("Giornata N°"+df['Giornata N'][0]+", Modulo scelto: "+Modulo_scelto)
 fig.patch.set_visible(False)
 ax.axis('off')
 ax.axis('tight')
