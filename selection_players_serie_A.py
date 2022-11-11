@@ -60,10 +60,11 @@ def scramping(paragrafo,start_index,end_match):
 
   in_campo=False
   for g in range (0,len(panchina),2):
-    
-    squadra["Giocatori"].append(panchina[g])
-    squadra["Percentuale di gioco del giocatore"].append(panchina[g+1].strip())
-    squadra["Titolare"].append(in_campo)
+    if (panchina[g].split()[:2]!=['Ultimo','aggiornamento']):
+      
+      squadra["Giocatori"].append(panchina[g])
+      squadra["Percentuale di gioco del giocatore"].append(panchina[g+1].strip())
+      squadra["Titolare"].append(in_campo)
 
   df1=pd.DataFrame(squadra)
 
@@ -90,10 +91,11 @@ def scramping(paragrafo,start_index,end_match):
 
   in_campo=False
   for g in range (0,len(panchina),2):
-    
-    squadra["Giocatori"].append(panchina[g])
-    squadra["Percentuale di gioco del giocatore"].append(panchina[g+1].strip())
-    squadra["Titolare"].append(in_campo)
+    if (panchina[g].split()[:2]!=['Ultimo','aggiornamento']):
+        
+      squadra["Giocatori"].append(panchina[g])
+      squadra["Percentuale di gioco del giocatore"].append(panchina[g+1].strip())
+      squadra["Titolare"].append(in_campo)
 
   df2=pd.DataFrame(squadra)
 
@@ -131,7 +133,7 @@ def scramping(paragrafo,start_index,end_match):
     for l in range (0,len(lista_squalificati),2):
       if g.strip()==lista_squalificati[l].strip():
         trovato_s=True
-        lista_squalificati_.append(True.strip())
+        lista_squalificati_.append(True)
         break
     if trovato_s==False:
       lista_squalificati_.append(False)
@@ -354,6 +356,7 @@ def aggiungi(ruolo,g,rosa,qnt):
   ris={'Giocatori':rosa['Giocatori'],'Ruolo':rosa['Ruolo Fanta'],'Percentuale di gioco':val,"FVM":fvm_top}
   r=pd.DataFrame(ris)
   r['Sort']=(r['FVM']+r['Percentuale di gioco'])/2
+  # r=r.loc[rosa['Titolare']==True ]
   r = r.sort_values(['Sort'], ascending=False)
   r=r.loc[r['Ruolo']==ruolo]
   g=g.append(r.head(qnt))
@@ -392,6 +395,8 @@ formazione=pd.DataFrame(ris)
 formazione=controlla(formazione,rosa).reset_index(drop=True)
 formazione['Sort']=(formazione['FVM']+formazione['Percentuale di gioco'])/2
 
+formazione.loc[formazione['Percentuale di gioco']==0,'Sort']=0.0
+
 # formazione = formazione.sort_values(['FVM','Percentuale di gioco'], ascending=False)
 formazione = formazione.sort_values(['Sort'], ascending=False)
 #formazione
@@ -422,7 +427,73 @@ formazione_finale=formazione_titolare.append(formazione_panchina)
 formazione_finale.index = np.arange(1, len(formazione_finale) + 1)
 #formazione_finale
 
+
+def rosa_with_module(Modulo=[3,4,3]):
+
+  # g=rosa
+  g=rosa.loc[rosa['Titolare']==True ]
+  val=g['Percentuale di gioco del giocatore'].values
+  fvm_top=g['FVM'].values
+
+  for v in range (len(val)):
+    val[v]=int (val[v][:len(val[v])-1])
+
+  ris={'Giocatori':g['Giocatori'],'Ruolo':g['Ruolo Fanta'],'Percentuale di gioco':val,"FVM":fvm_top}
+
+  formazione=pd.DataFrame(ris)
+
+  formazione=controlla(formazione,rosa).reset_index(drop=True)
+  formazione['Sort']=(formazione['FVM']+formazione['Percentuale di gioco'])/2
+
+  formazione.loc[formazione['Percentuale di gioco']==0,'Sort']=0.0
+
+  # formazione = formazione.sort_values(['FVM','Percentuale di gioco'], ascending=False)
+  formazione = formazione.sort_values(['Sort'], ascending=False)
+  formazione
+
+  attaccanti_titolari,attaccanti_panchinari= titolari_panchina(formazione,'A',(Modulo[2]),2)
+  centrocampisti_titolari,centrocampisti_panchinari= titolari_panchina(formazione,'C',Modulo[1],2)
+  difensori_titolari,difensori_panchinari= titolari_panchina(formazione,'D',Modulo[0],2)
+  portieri_titolari,portieri_panchinari= titolari_panchina(formazione,'P',1,1)
+
+  formazione_titolare=portieri_titolari.append(difensori_titolari.append(centrocampisti_titolari.append(attaccanti_titolari))).reset_index(drop=True)
+  formazione_titolare.index = np.arange(1, len(formazione_titolare) + 1)
+  formazione_titolare['Giocatore in']='campo'
+  formazione_titolare
+
+  formazione_panchina=portieri_panchinari.append(difensori_panchinari.append(centrocampisti_panchinari.append(attaccanti_panchinari))).reset_index(drop=True)
+  formazione_panchina.index = np.arange(1, len(formazione_panchina) + 1)
+  formazione_panchina['Giocatore in']='panchina'
+  formazione_panchina
+
+  formazione_finale=formazione_titolare.append(formazione_panchina)
+  formazione_finale.index = np.arange(1, len(formazione_finale) + 1)
+  return formazione_finale
+
+Moduli=[[3,5,2],[3,4,3],[4,5,1],[4,4,2],[4,3,3],[5,3,2],[5,4,1]]
+rosa_3_5_2=rosa_with_module(Moduli[0])
+rosa_3_4_3=rosa_with_module(Moduli[1])
+rosa_4_5_1=rosa_with_module(Moduli[2])
+rosa_4_4_2=rosa_with_module(Moduli[3])
+rosa_4_3_3=rosa_with_module(Moduli[4])
+rosa_5_3_2=rosa_with_module(Moduli[5])
+rosa_5_4_1=rosa_with_module(Moduli[6])
+ROSE_FINALI=[rosa_3_5_2,rosa_3_4_3,rosa_4_5_1,rosa_4_4_2,rosa_4_3_3,rosa_5_3_2,rosa_5_4_1]
+
+s=[]
+for i in ROSE_FINALI:
+  s.append(sum(i[i['Giocatore in']=='campo']['Sort']))
+mass=max(s)
+index = s.index(mass)
+Modulo_scelto=str(Moduli[index][0])+'-'+str(Moduli[index][1])+'-'+str(Moduli[index][2])
+formazione_finale=ROSE_FINALI[index]
+
+
 formazione_finale.to_excel("C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fanatacalcio_project/formazione_finale_da schierare.xlsx")
+
+import webbrowser
+webbrowser.open('https://leghe.fantacalcio.it/iacucci-al-governo/area-gioco/inserisci-formazione')
+
 
 fig, ax = plt.subplots()
 fig.set_size_inches(10, 10)
@@ -436,3 +507,4 @@ ax.table(cellText=formazione_finale.values, colLabels=formazione_finale.columns,
 fig.tight_layout()
 plt.savefig('C:/Users/matti/Desktop/doc/FANTACALCIO 2022-2023/Fanatacalcio_project/formazione_finale_da schierare.png', dpi=300)
 plt.show()
+
